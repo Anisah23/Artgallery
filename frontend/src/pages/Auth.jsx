@@ -51,6 +51,12 @@ export default function Auth({ initialMode = "login" }) {
         body: JSON.stringify(requestData),
       });
 
+      // Check if data.user exists
+      if (!data || !data.user) {
+        setError('Invalid response from server');
+        return;
+      }
+
       // Verify role matches for login
       if (mode === 'login') {
         const userRole = data.user.role === 'artist' ? 'Artist' : 'Collector';

@@ -31,6 +31,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/auth" element={<Auth />} />
+                    <Route path="/login" element={<Auth initialMode="login" />} />
                     <Route path="/gallery" element={<Gallery />} />
 
                     <Route path="/wishlist" element={<Wishlist />} />
