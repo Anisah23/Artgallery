@@ -1,0 +1,92 @@
+.collector-dashboard {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding: 24px;
+  padding-top: 80px; /* Account for fixed navbar */
+}
+
+.dashboard-container {
+  max-width: 90rem;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.dashboard-title {
+  font-size: 2.5rem;
+  color: #5c1a1a;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.dashboard-subtitle {
+  color: #4b5563;
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-card {
+  background: white;
+  border: 1px solid #d4af37;
+  border-radius: 12px;
+  transition: box-shadow 0.2s ease-in-out;
+  overflow: hidden;
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+}
+
+.card-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #5c1a1a;
+}
+
+.card-icon {
+  color: #d4af37;
+}
+
+.card-content {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.card-value {
+  font-size: 1.875rem;
+  color: #5c1a1a;
+  font-weight: 700;
+}
+
+.card-description {
+  font-size: 0.75rem;
+  color: #4b5563;
+  margin-top: 0.25rem;
+}
+
+.dashboard-lower {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.empty-text {
+  color: #6b7280;
+  text-align: center;
+  padding: 2rem 0;
+  margin: 0;
+}

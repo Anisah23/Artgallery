@@ -1,0 +1,27 @@
+.gallery-stats {
+  color: #6b7280;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.gallery-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.gallery-description {
+  color: #6b7280;
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}

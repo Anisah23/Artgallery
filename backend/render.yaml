@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: art-gallery-backend
+    runtime: python3
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app
+    envVars:
+      - key: SECRET_KEY
+        value: 7b1903e28e1789a0f1864f6db4d009981dc2a1cdfd9d9ecd22f91c04cf56b4ff
+      - key: JWT_SECRET_KEY
+        value: 668dfdc571a54cbaec362ce80a9eb32012d2d90e6d273bad9e143ced9517f897
+      - key: DATABASE_URL
+        sync: false  # Set manually in Render dashboard
+      - key: CLOUDINARY_URL
+        sync: false  # Set manually in Render dashboard
+      - key: SENDGRID_API_KEY
+        sync: false  # Set manually in Render dashboard

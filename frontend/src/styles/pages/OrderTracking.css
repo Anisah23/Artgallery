@@ -1,0 +1,45 @@
+.order-delivery {
+  margin-top: 15px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+.tracking-info {
+  margin: 8px 0;
+  font-weight: 600;
+}
+
+.tracking-number {
+  background: #1e40af;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.shipped-date {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.confirmed-message {
+  color: #059669;
+  font-weight: 600;
+}
+
+.pending-message {
+  color: #d97706;
+  font-weight: 600;
+}
+
+.status-completed {
+  color: #059669;
+  font-weight: 600;
+}
+
+.inline-icon {
+  vertical-align: middle;
+  margin-right: 5px;
+}

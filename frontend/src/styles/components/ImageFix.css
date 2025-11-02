@@ -1,0 +1,13 @@
+.art-image, .card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+.art-card img, .art-gallery-card img {
+  max-width: 100%;
+  height: auto;
+  min-height: 150px;
+}

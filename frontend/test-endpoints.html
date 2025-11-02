@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endpoint Tester</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        button { margin: 5px; padding: 10px; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+        .flow-test { background: #e8f4fd; }
+    </style>
+</head>
+<body>
+    <h1>Art Gallery API Endpoint Tester</h1>
+    
+    <div class="test-section">
+        <h2>1. Health Check</h2>
+        <button onclick="testHealth()">Test Health</button>
+        <div id="health-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Authentication</h2>
+        <button onclick="testRegister()">Test Register</button>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="auth-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Gallery</h2>
+        <button onclick="testGallery()">Test Gallery</button>
+        <div id="gallery-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Cart Operations</h2>
+        <button onclick="testCart()">Get Cart</button>
+        <button onclick="testAddToCart()">Add to Cart</button>
+        <button onclick="testUpdateCart()">Update Cart</button>
+        <div id="cart-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Wishlist Operations</h2>
+        <button onclick="testWishlist()">Get Wishlist</button>
+        <button onclick="testAddToWishlist()">Add to Wishlist</button>
+        <div id="wishlist-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Orders</h2>
+        <button onclick="testOrders()">Get Orders</button>
+        <button onclick="testCreateOrder()">Create Order</button>
+        <div id="orders-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>7. Payment</h2>
+        <button onclick="testPayment()">Create Payment Intent</button>
+        <div id="payment-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>8. Notifications</h2>
+        <button onclick="testNotifications()">Get Notifications</button>
+        <div id="notifications-result" class="result"></div>
+    </div>
+
+    <div class="test-section flow-test">
+        <h2>9. Full Flow Test</h2>
+        <button onclick="runFullFlow()">Run Complete Flow</button>
+        <div id="flow-result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+        let authToken = null;
+
+        function log(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            element.innerHTML += `<div class="${isError ? 'error' : 'success'}">${message}</div>`;
+        }
+
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json().catch(() => null);
+                return { status: response.status, data, ok: response.ok };
+            } catch (error) {
+                return { error: error.message };
+            }
+        }
+
+        async function testHealth() {
+            document.getElementById('health-result').innerHTML = '';
+            log('health-result', 'Testing health endpoint...');
+            
+            const result = await apiCall('/health');
+            if (result.ok) {
+                log('health-result', `✓ Health check passed: ${JSON.stringify(result.data)}`);
+            } else {
+                log('health-result', `✗ Health check failed: ${result.status}`, true);
+            }
+        }
+
+        async function testRegister() {
+            document.getElementById('auth-result').innerHTML = '';
+            log('auth-result', 'Testing register endpoint (FIXED)...');
+            
+            const userData = {
+                email: 'test@example.com',
+                password: 'Test123456',
+                fullName: 'Test User',
+                role: 'collector'
+            };
+            
+            const result = await apiCall('/api/auth/register', {
+                method: 'POST',
+                body: JSON.stringify(userData)
+            });
+            
+            if (result.ok || result.status === 400) {
+                log('auth-result', `✓ Register endpoint working: ${result.status}`);
+            } else {
+                log('auth-result', `✗ Register failed: ${result.status} - ${JSON.stringify(result.data)}`, true);
+            }
+        }
+
+        async function testLogin() {
+            log('auth-result', 'Testing login endpoint...');
+            
+            const loginData = {
+                email: 'test@example.com',
+                password: 'Test123456'
+            };
+            
+            const result = await apiCall('/api/auth/login', {
+                method: 'POST',
+                body: JSON.stringify(loginData)
+            });
+            
+            if (result.ok) {
+                authToken = result.data.access_token;
+                log('auth-result', `✓ Login successful, token received`);
+            } else {
+                log('auth-result', `✗ Login failed: ${result.status}`, true);
+            }
+        }
+
+        async function testGallery() {
+            document.getElementById('gallery-result').innerHTML = '';
+            log('gallery-result', 'Testing gallery endpoint...');
+            
+            const result = await apiCall('/api/gallery/');
+            if (result.ok) {
+                const artworks = result.data.items || result.data || [];
+                log('gallery-result', `✓ Gallery loaded: ${artworks.length} artworks`);
+            } else {
+                log('gallery-result', `✗ Gallery failed: ${result.status}`, true);
+            }
+        }
+
+        let testArtworkId = null;
+
+        async function testCart() {
+            document.getElementById('cart-result').innerHTML = '';
+            if (!authToken) {
+                log('cart-result', '⚠ Please login first', true);
+                return;
+            }
+            
+            log('cart-result', 'Testing get cart...');
+            const result = await apiCall('/api/cart/');
+            if (result.ok) {
+                const items = result.data.items || result.data || [];
+                log('cart-result', `✓ Cart loaded: ${items.length} items`);
+            } else {
+                log('cart-result', `✗ Cart failed: ${result.status}`, true);
+            }
+        }
+
+        async function testAddToCart() {
+            if (!authToken || !testArtworkId) {
+                log('cart-result', '⚠ Need login and artwork ID', true);
+                return;
+            }
+            
+            log('cart-result', 'Testing add to cart...');
+            const result = await apiCall('/api/cart/', {
+                method: 'POST',
+                body: JSON.stringify({ artworkId: testArtworkId })
+            });
+            
+            if (result.ok || result.status === 400) {
+                log('cart-result', `✓ Add to cart: ${result.status}`);
+            } else {
+                log('cart-result', `✗ Add to cart failed: ${result.status}`, true);
+            }
+        }
+
+        async function testUpdateCart() {
+            if (!authToken || !testArtworkId) {
+                log('cart-result', '⚠ Need login and artwork ID', true);
+                return;
+            }
+            
+            log('cart-result', 'Testing update cart...');
+            const result = await apiCall(`/api/cart/${testArtworkId}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ quantity: 2 })
+            });
+            
+            if (result.ok || result.status === 404) {
+                log('cart-result', `✓ Update cart: ${result.status}`);
+            } else {
+                log('cart-result', `✗ Update cart failed: ${result.status}`, true);
+            }
+        }
+
+        async function testWishlist() {
+            document.getElementById('wishlist-result').innerHTML = '';
+            if (!authToken) {
+                log('wishlist-result', '⚠ Please login first', true);
+                return;
+            }
+            
+            log('wishlist-result', 'Testing get wishlist...');
+            const result = await apiCall('/api/wishlist/');
+            if (result.ok) {
+                const items = result.data.items || result.data || [];
+                log('wishlist-result', `✓ Wishlist loaded: ${items.length} items`);
+            } else {
+                log('wishlist-result', `✗ Wishlist failed: ${result.status}`, true);
+            }
+        }
+
+        async function testAddToWishlist() {
+            if (!authToken || !testArtworkId) {
+                log('wishlist-result', '⚠ Need login and artwork ID', true);
+                return;
+            }
+            
+            log('wishlist-result', 'Testing add to wishlist...');
+            const result = await apiCall('/api/wishlist/', {
+                method: 'POST',
+                body: JSON.stringify({ artworkId: testArtworkId })
+            });
+            
+            if (result.ok || result.status === 400) {
+                log('wishlist-result', `✓ Add to wishlist: ${result.status}`);
+            } else {
+                log('wishlist-result', `✗ Add to wishlist failed: ${result.status}`, true);
+            }
+        }
+
+        async function testOrders() {
+            document.getElementById('orders-result').innerHTML = '';
+            if (!authToken) {
+                log('orders-result', '⚠ Please login first', true);
+                return;
+            }
+            
+            log('orders-result', 'Testing get orders...');
+            const result = await apiCall('/api/orders/');
+            if (result.ok) {
+                const orders = result.data.items || result.data || [];
+                log('orders-result', `✓ Orders loaded: ${orders.length} orders`);
+            } else {
+                log('orders-result', `✗ Orders failed: ${result.status}`, true);
+            }
+        }
+
+        async function testCreateOrder() {
+            if (!authToken || !testArtworkId) {
+                log('orders-result', '⚠ Need login and artwork ID', true);
+                return;
+            }
+            
+            log('orders-result', 'Testing create order...');
+            const orderData = {
+                items: [{ artwork_id: testArtworkId, quantity: 1, price: 100 }],
+                shipping_details: {
+                    fullName: 'Test User',
+                    address: '123 Test St',
+                    city: 'Test City',
+                    postalCode: '12345',
+                    country: 'US'
+                },
+                total_amount: 100
+            };
+            
+            const result = await apiCall('/api/orders/', {
+                method: 'POST',
+                body: JSON.stringify(orderData)
+            });
+            
+            if (result.ok) {
+                log('orders-result', `✓ Order created successfully`);
+            } else {
+                log('orders-result', `✗ Create order failed: ${result.status} - ${JSON.stringify(result.data)}`, true);
+            }
+        }
+
+        async function testPayment() {
+            document.getElementById('payment-result').innerHTML = '';
+            if (!authToken) {
+                log('payment-result', '⚠ Please login first', true);
+                return;
+            }
+            
+            log('payment-result', 'Testing payment intent...');
+            const paymentData = {
+                amount: 100,
+                currency: 'usd',
+                description: 'Test payment'
+            };
+            
+            const result = await apiCall('/api/payments/create-intent', {
+                method: 'POST',
+                body: JSON.stringify(paymentData)
+            });
+            
+            if (result.ok && result.data.client_secret) {
+                log('payment-result', `✓ Payment intent created`);
+            } else {
+                log('payment-result', `✗ Payment failed: ${result.status}`, true);
+            }
+        }
+
+        async function testNotifications() {
+            document.getElementById('notifications-result').innerHTML = '';
+            if (!authToken) {
+                log('notifications-result', '⚠ Please login first', true);
+                return;
+            }
+            
+            log('notifications-result', 'Testing notifications...');
+            const result = await apiCall('/api/collectors/notifications');
+            if (result.ok) {
+                const notifications = result.data || [];
+                log('notifications-result', `✓ Notifications loaded: ${notifications.length} items`);
+            } else {
+                log('notifications-result', `✗ Notifications failed: ${result.status}`, true);
+            }
+        }
+
+        async function runFullFlow() {
+            document.getElementById('flow-result').innerHTML = '';
+            log('flow-result', '🚀 Starting full flow test...');
+            
+            // 1. Health check
+            log('flow-result', '1. Testing health...');
+            let result = await apiCall('/health');
+            if (!result.ok) {
+                log('flow-result', '✗ Health check failed', true);
+                return;
+            }
+            
+            // 2. Register/Login
+            log('flow-result', '2. Testing auth...');
+            await apiCall('/api/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: 'test@example.com',
+                    password: 'Test123456',
+                    fullName: 'Test User',
+                    role: 'collector'
+                })
+            });
+            
+            result = await apiCall('/api/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ email: 'test@example.com', password: 'Test123456' })
+            });
+            
+            if (!result.ok) {
+                log('flow-result', '✗ Login failed', true);
+                return;
+            }
+            
+            authToken = result.data.access_token;
+            
+            // 3. Get gallery and artwork
+            log('flow-result', '3. Getting artworks...');
+            result = await apiCall('/api/gallery/');
+            if (result.ok) {
+                const artworks = result.data.items || result.data || [];
+                if (artworks.length > 0) {
+                    testArtworkId = artworks[0].id;
+                    log('flow-result', `✓ Found ${artworks.length} artworks`);
+                }
+            }
+            
+            // 4. Test cart operations
+            if (testArtworkId) {
+                log('flow-result', '4. Testing cart operations...');
+                await apiCall('/api/cart/', { method: 'POST', body: JSON.stringify({ artworkId: testArtworkId }) });
+                result = await apiCall('/api/cart/');
+                if (result.ok) log('flow-result', '✓ Cart operations working');
+                
+                // 5. Test wishlist
+                log('flow-result', '5. Testing wishlist...');
+                await apiCall('/api/wishlist/', { method: 'POST', body: JSON.stringify({ artworkId: testArtworkId }) });
+                result = await apiCall('/api/wishlist/');
+                if (result.ok) log('flow-result', '✓ Wishlist operations working');
+                
+                // 6. Test payment
+                log('flow-result', '6. Testing payment...');
+                result = await apiCall('/api/payments/create-intent', {
+                    method: 'POST',
+                    body: JSON.stringify({ amount: 100, currency: 'usd' })
+                });
+                if (result.ok) log('flow-result', '✓ Payment intent working');
+            }
+            
+            // 7. Test orders and notifications
+            log('flow-result', '7. Testing orders and notifications...');
+            result = await apiCall('/api/orders/');
+            if (result.ok) log('flow-result', '✓ Orders endpoint working');
+            
+            result = await apiCall('/api/collectors/notifications');
+            if (result.ok) log('flow-result', '✓ Notifications endpoint working');
+            
+            log('flow-result', '🎉 Full flow test completed!');
+        }
+
+        // Enhanced gallery test to get artwork ID
+        async function testGallery() {
+            document.getElementById('gallery-result').innerHTML = '';
+            log('gallery-result', 'Testing gallery endpoint...');
+            
+            const result = await apiCall('/api/gallery/');
+            if (result.ok) {
+                const artworks = result.data.items || result.data || [];
+                if (artworks.length > 0) {
+                    testArtworkId = artworks[0].id;
+                    log('gallery-result', `✓ Gallery loaded: ${artworks.length} artworks (ID: ${testArtworkId})`);
+                } else {
+                    log('gallery-result', `✓ Gallery loaded: 0 artworks`);
+                }
+            } else {
+                log('gallery-result', `✗ Gallery failed: ${result.status}`, true);
+            }
+        }
+
+        // Auto-test health on load
+        window.onload = () => {
+            testHealth();
+        };
+    </script>
+</body>
+</html>
