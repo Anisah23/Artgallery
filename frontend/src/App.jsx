@@ -15,6 +15,7 @@ import Orders from './pages/Orders';
 import Notifications from './pages/Notifications';
 import CollectorDashboard from './pages/CollectorDashboard';
 import ArtistDashboard from './pages/ArtistDashboard';
+import Delivery from './pages/Delivery';
 
 import './App.css';
 
@@ -24,7 +25,7 @@ function App() {
       <CartProvider>
         <WishlistProvider>
           <OrdersProvider>
-            <Router>
+            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <div className="app">
                 <Navigation />
                 <main className="main-content">
@@ -38,6 +39,7 @@ function App() {
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/orders" element={<Orders />} />
+                    <Route path="/delivery" element={<Delivery />} />
                     <Route path="/notifications" element={<Notifications />} />
                     <Route path="/dashboard/collector" element={<CollectorDashboard />} />
                     <Route path="/dashboard/artist" element={<ArtistDashboard />} />

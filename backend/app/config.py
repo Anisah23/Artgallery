@@ -9,7 +9,7 @@ class Config:
     
     # Database Configuration
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL", "postgresql://postgres:sowoozoo23@localhost:5432/artgallery"
+        "DATABASE_URL", "sqlite:///artgallery.db"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {

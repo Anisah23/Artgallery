@@ -1,23 +1,21 @@
 import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { WishlistContext } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
 import { Heart, ShoppingCart, X } from "lucide-react";
-import { apiRequest } from '../utils/api';
 import '../styles/pages/Wishlist.css';
 
 const Wishlist = () => {
   const { wishlist, removeFromWishlist } = useContext(WishlistContext);
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const handlePurchase = async (art) => {
     try {
-      // Add to cart instead of direct purchase
-      await apiRequest('/api/cart/', {
-        method: 'POST',
-        body: JSON.stringify({ artworkId: art.id, quantity: 1 }),
-      });
-      console.log(`${art.title} added to cart!`);
+      await addToCart(art.id);
+      navigate('/cart');
     } catch (error) {
       console.error('Error adding to cart:', error);
-      console.error('Failed to add to cart');
     }
   };
 
@@ -101,18 +99,14 @@ const Wishlist = () => {
               </div>
               <button
                 className="wishlist-purchase-all-btn"
-                onClick={async () => {
+onClick={async () => {
                   try {
                     for (const art of wishlist) {
-                      await apiRequest('/api/cart/', {
-                        method: 'POST',
-                        body: JSON.stringify({ artworkId: art.id, quantity: 1 }),
-                      });
+                      await addToCart(art.id);
                     }
-                    console.log("All items added to cart!");
+                    navigate('/cart');
                   } catch (error) {
                     console.error('Error adding items to cart:', error);
-                    console.log('Failed to add some items to cart');
                   }
                 }}
               >

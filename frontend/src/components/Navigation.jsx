@@ -9,6 +9,8 @@ export default function Navigation() {
   const { wishlistCount } = useWishlist();
   const location = useLocation();
   const navigate = useNavigate();
+  
+  console.log('Navigation render - isLoggedIn:', isLoggedIn, 'role:', role, 'path:', location.pathname);
 
   const handleLogout = () => {
     logout();
@@ -50,6 +52,12 @@ export default function Navigation() {
                     className={`nav-link ${location.pathname === '/orders' ? 'active' : ''}`}
                   >
                     Orders
+                  </Link>
+                  <Link
+                    to="/delivery"
+                    className={`nav-link ${location.pathname === '/delivery' ? 'active' : ''}`}
+                  >
+                    Delivery
                   </Link>
                   <Link
                     to="/cart"

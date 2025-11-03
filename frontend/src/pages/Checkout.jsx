@@ -1,53 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useAuth } from '../context/AuthContext';
 import { apiRequest } from '../utils/api';
 import '../styles/pages/Checkout.css';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51SNtuKJxmqf3ZKkyEg7xJwilBrzd3uFHdDyTytF6q4EbQYelVanwXPtNNu1W2CDd9pWdsRmndRhQAnSAy4dgG3Yp00kxzXdOeA');
-
 const CheckoutForm = ({ cartItems, shippingInfo, totalAmount, onSuccess, onError }) => {
-  const stripe = useStripe();
-  const elements = useElements();
   const [processing, setProcessing] = useState(false);
-  const [clientSecret, setClientSecret] = useState('');
-
-  useEffect(() => {
-    if (totalAmount > 0) {
-      createPaymentIntent();
-    }
-  }, [totalAmount]);
-
-  const createPaymentIntent = async () => {
-    if (!totalAmount || totalAmount <= 0) return;
-
-    try {
-      const response = await apiRequest('/api/payments/create-intent', {
-        method: 'POST',
-        body: JSON.stringify({
-          amount: totalAmount,
-          currency: 'usd',
-          description: `Art purchase - ${cartItems.length} items`,
-          items: cartItems
-        })
-      });
-
-      if (response?.client_secret) {
-        setClientSecret(response.client_secret);
-      }
-    } catch (error) {
-      onError(error.message || 'Failed to initialize payment');
-    }
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!stripe || !elements || !clientSecret) {
-      onError('Payment system not ready. Please try again.');
-      return;
-    }
 
     // Validate required shipping information
     const requiredFields = ['fullName', 'email', 'address', 'city', 'postalCode', 'country'];
@@ -60,42 +21,17 @@ const CheckoutForm = ({ cartItems, shippingInfo, totalAmount, onSuccess, onError
 
     setProcessing(true);
     try {
-      // Step 2: Confirm Card Payment with Stripe
-      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement),
-          billing_details: {
-            name: shippingInfo.fullName,
-            email: shippingInfo.email || '',
-            address: {
-              line1: shippingInfo.address,
-              city: shippingInfo.city,
-              postal_code: shippingInfo.postalCode,
-              country: shippingInfo.country
-            }
-          }
-        }
-      });
-
-      if (error) {
-        console.error('Stripe payment error:', error);
-        onError(error.message);
-      } else if (paymentIntent.status === 'succeeded') {
-        console.log('Payment succeeded! Creating order...');
-        // Step 3: Create order after successful payment
-        await createOrder(paymentIntent.id);
-      } else {
-        onError('Payment was not completed successfully');
-      }
+      // Create order without payment processing (temporary)
+      await createOrder();
     } catch (error) {
-      console.error('Payment processing error:', error);
-      onError('Payment failed. Please try again.');
+      console.error('Order creation error:', error);
+      onError('Order creation failed. Please try again.');
     } finally {
       setProcessing(false);
     }
   };
 
-  const createOrder = async (paymentIntentId) => {
+  const createOrder = async () => {
     try {
       const orderData = {
         items: cartItems.map(item => ({
@@ -111,7 +47,7 @@ const CheckoutForm = ({ cartItems, shippingInfo, totalAmount, onSuccess, onError
           country: shippingInfo.country
         },
         total_amount: totalAmount,
-        payment_intent_id: paymentIntentId // Include payment reference
+        payment_status: 'pending' // Temporary status
       };
 
       const response = await apiRequest('/api/orders', {
@@ -198,19 +134,8 @@ const CheckoutForm = ({ cartItems, shippingInfo, totalAmount, onSuccess, onError
         <div className="checkout-section payment">
           <h2 className="section-title">Payment Information</h2>
           <div className="form-group">
-            <label className="form-label">Card Details</label>
-            <div className="card-element-container">
-              <CardElement
-                options={{
-                  style: {
-                    base: {
-                      fontSize: '16px',
-                      color: '#424770',
-                      '::placeholder': { color: '#aab7c4' }
-                    }
-                  }
-                }}
-              />
+            <div className="payment-notice">
+              <p>Payment processing is temporarily disabled. Your order will be created with pending payment status.</p>
             </div>
           </div>
         </div>
@@ -243,9 +168,9 @@ const CheckoutForm = ({ cartItems, shippingInfo, totalAmount, onSuccess, onError
         <button
           type="submit"
           className="btn-primary"
-          disabled={!stripe || processing}
+          disabled={processing}
         >
-          {processing ? 'Processing...' : `Pay $${totalAmount.toFixed(2)}`}
+          {processing ? 'Processing...' : `Create Order - $${totalAmount.toFixed(2)}`}
         </button>
       </div>
     </form>
@@ -272,8 +197,8 @@ export default function Checkout() {
 
   const fetchCart = async () => {
     try {
-      const data = await apiRequest('/api/cart/');
-      setCartItems(data.items || []);
+      const localCart = JSON.parse(localStorage.getItem('cart') || '{"items": []}');
+      setCartItems(localCart.items || []);
     } catch (error) {
       console.error('Error fetching cart:', error);
       setCartItems([]);
@@ -295,6 +220,7 @@ export default function Checkout() {
 
   const handlePaymentSuccess = (order) => {
     // Clear cart and navigate to orders
+    localStorage.setItem('cart', JSON.stringify({items: []}));
     setCartItems([]);
     navigate('/orders', { 
       state: { newOrder: order },
@@ -341,15 +267,13 @@ export default function Checkout() {
           </div>
         )}
 
-        <Elements stripe={stripePromise}>
-          <CheckoutForm
-            cartItems={cartItems}
-            shippingInfo={{ ...shippingInfo, onChange: handleShippingChange }}
-            totalAmount={getTotalPrice()}
-            onSuccess={handlePaymentSuccess}
-            onError={handlePaymentError}
-          />
-        </Elements>
+        <CheckoutForm
+          cartItems={cartItems}
+          shippingInfo={{ ...shippingInfo, onChange: handleShippingChange }}
+          totalAmount={getTotalPrice()}
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
+        />
       </div>
     </div>
   );

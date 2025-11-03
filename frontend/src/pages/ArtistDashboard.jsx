@@ -28,8 +28,9 @@ export default function ArtistDashboard() {
   });
 
   useEffect(() => {
-    fetchArtworks();
-    fetchStats();
+    // fetchArtworks(); // Temporarily disabled
+    // fetchStats(); // Temporarily disabled
+    setLoading(false);
   }, []);
 
   const fetchArtworks = async () => {
@@ -62,10 +63,12 @@ export default function ArtistDashboard() {
       
       setStats({
         salesThisMonth,
-        totalValue: myArtworks.reduce((sum, art) => sum + art.price, 0)
+        totalValue: artworks.reduce((sum, art) => sum + art.price, 0)
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
+      // Set default stats on error
+      setStats({ salesThisMonth: 0, totalValue: 0 });
     }
   };
 

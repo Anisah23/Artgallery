@@ -25,9 +25,8 @@ export default function Cart() {
 
   const fetchCart = async () => {
     try {
-      const data = await apiRequest('/api/cart/');
-      const items = data.items || data || [];
-      setCartItems(items);
+      const localCart = JSON.parse(localStorage.getItem('cart') || '{"items": []}');
+      setCartItems(localCart.items || []);
     } catch (error) {
       console.error('Error fetching cart:', error);
       setCartItems([]);
@@ -55,9 +54,9 @@ export default function Cart() {
 
   const removeItem = async (artworkId) => {
     try {
-      await apiRequest(`/api/cart/${artworkId}`, {
-        method: 'DELETE',
-      });
+      const currentCart = JSON.parse(localStorage.getItem('cart') || '{"items": []}');
+      currentCart.items = currentCart.items.filter(item => item.artwork_id !== artworkId);
+      localStorage.setItem('cart', JSON.stringify(currentCart));
       await fetchCart();
       toast.success("Removed from cart");
     } catch (error) {

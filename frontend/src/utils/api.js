@@ -12,6 +12,7 @@ class ApiError extends Error {
 export const apiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
   const token = localStorage.getItem('token');
+  console.log('Making API request to:', endpoint, 'with token:', token ? 'present' : 'missing');
 
   const config = {
     headers: {
@@ -32,12 +33,17 @@ export const apiRequest = async (endpoint, options = {}) => {
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
-      // Handle expired token
+      // Handle expired token - but don't redirect if we're already on auth pages
       if (response.status === 401 || (response.status === 500 && data?.message?.includes('expired'))) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
-        return;
+        console.log('401 error on:', endpoint, 'Current path:', window.location.pathname);
+        const currentPath = window.location.pathname;
+        if (!currentPath.includes('/auth') && !currentPath.includes('/login')) {
+          console.log('Redirecting to login due to 401');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.href = '/login';
+          return;
+        }
       }
       
       throw new ApiError(

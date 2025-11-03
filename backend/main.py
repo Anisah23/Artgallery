@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import os
 from datetime import datetime, timedelta
 import stripe
-from stripe.error import ApiError, SignatureVerificationError # <-- NEW: Import specific Stripe errors
+import stripe
 import json
 from dotenv import load_dotenv
 from app import create_app
@@ -54,8 +54,10 @@ def create_payment_intent():
             'payment_intent_id': intent.id
         }), 200
         
-    except ApiError as e: 
-        return jsonify({'error': f"Stripe API Error: {str(e)}"}), 400 
+    except Exception as stripe_error: 
+        if 'stripe' in str(type(stripe_error)).lower():
+            return jsonify({'error': f"Stripe API Error: {str(stripe_error)}"}), 400
+        raise 
     except Exception as e:
        
         print(f"Error creating payment intent: {e}")
@@ -80,10 +82,11 @@ def stripe_webhook():
         # Invalid payload
         print(f"Webhook Error: Invalid payload: {e}")
         return jsonify({'error': 'Invalid payload'}), 400
-    except SignatureVerificationError as e:
-        # Invalid signature
-        print(f"Webhook Error: Invalid signature: {e}")
-        return jsonify({'error': 'Invalid signature'}), 400
+    except Exception as sig_error:
+        if 'signature' in str(sig_error).lower():
+            print(f"Webhook Error: Invalid signature: {sig_error}")
+            return jsonify({'error': 'Invalid signature'}), 400
+        raise
     except Exception as e:
         # Catch any other unexpected error during event construction
         print(f"Unexpected webhook error: {e}")

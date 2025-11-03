@@ -74,7 +74,7 @@ export default function ArtworkCard({ artwork }) {
               e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzlDQTNBRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
             }}
           />
-          {role === 'collector' && (
+          {role === 'Collector' && (
             <button
               onClick={handleAddToWishlist}
               className={`wishlist-btn ${isInWishlist(artwork.id) ? 'active' : ''}`}
@@ -92,7 +92,7 @@ export default function ArtworkCard({ artwork }) {
           <p className="card-description">{artwork.description}</p>
           <div className="card-footer">
             <p className="artwork-price">${artwork.price.toLocaleString()}</p>
-            {role === 'collector' && (
+            {role === 'Collector' && (
               <button
                 className="buy-button"
                 onClick={handleBuy}

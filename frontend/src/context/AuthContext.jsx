@@ -13,14 +13,21 @@ export const AuthProvider = ({ children }) => {
 
   // Simulate checking localStorage or API for persisted login
   useEffect(() => {
+    console.log('AuthContext useEffect running');
     try {
       const storedUser = localStorage.getItem('user');
       const storedToken = localStorage.getItem('token');
+      console.log('Stored user:', storedUser);
+      console.log('Stored token:', storedToken);
       if (storedUser && storedToken) {
         const userData = JSON.parse(storedUser);
+        console.log('Setting user data:', userData);
         setUser(userData);
         setRole(userData.role === "artist" ? "Artist" : "Collector");
         setIsLoggedIn(true);
+        console.log('Login state set to true');
+      } else {
+        console.log('No stored user/token found');
       }
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -30,6 +37,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData, userRole, token) => {
+    console.log('Login function called with:', userData, userRole, token);
     setUser(userData);
     setRole(userData.role === "artist" ? "Artist" : "Collector");
     setIsLoggedIn(true);
@@ -37,6 +45,7 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       localStorage.setItem('token', token);
     }
+    console.log('Login state updated, isLoggedIn should be true');
   };
 
   const logout = () => {

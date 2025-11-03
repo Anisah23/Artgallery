@@ -1,0 +1,259 @@
+.delivery-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 2rem 1rem;
+}
+
+.delivery-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.delivery-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.delivery-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.delivery-subtitle {
+  font-size: 1.1rem;
+  color: #718096;
+}
+
+.empty-deliveries {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.empty-icon {
+  color: #cbd5e0;
+  margin-bottom: 1rem;
+}
+
+.empty-deliveries h3 {
+  font-size: 1.5rem;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.empty-deliveries p {
+  color: #718096;
+}
+
+.deliveries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.delivery-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.delivery-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.delivery-header-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.delivery-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-icon {
+  border-radius: 50%;
+  padding: 0.25rem;
+}
+
+.status-icon.processing {
+  background: #fed7d7;
+  color: #e53e3e;
+}
+
+.status-icon.shipped {
+  background: #bee3f8;
+  color: #3182ce;
+}
+
+.status-icon.delivered {
+  background: #c6f6d5;
+  color: #38a169;
+}
+
+.status-text {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+.status-text.processing {
+  color: #e53e3e;
+}
+
+.status-text.shipped {
+  color: #3182ce;
+}
+
+.status-text.delivered {
+  color: #38a169;
+}
+
+.order-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.order-id {
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.delivery-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.artwork-info {
+  text-align: center;
+}
+
+.artwork-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.25rem;
+}
+
+.artist-name {
+  color: #718096;
+  font-style: italic;
+}
+
+.delivery-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.detail-icon {
+  color: #718096;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.detail-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.detail-value {
+  color: #2d3748;
+}
+
+.tracking-number {
+  font-family: monospace;
+  background: #f7fafc;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.tracking-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.track-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.track-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem;
+  font-size: 1.1rem;
+  color: #718096;
+}
+
+@media (max-width: 768px) {
+  .delivery-page {
+    padding: 1rem 0.5rem;
+  }
+  
+  .delivery-title {
+    font-size: 2rem;
+  }
+  
+  .delivery-card {
+    padding: 1rem;
+  }
+  
+  .delivery-header-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .order-info {
+    align-items: flex-start;
+  }
+}
