@@ -35,7 +35,7 @@ class CreatePaymentIntent(Resource):
                 currency=data.get('currency', 'usd'),
                 description=data.get('description', 'Art Gallery Purchase'),
                 automatic_payment_methods={'enabled': True}
-                metadata = {"order_id": "mock-order-123"
+                metadata = {"order_id": "mock-order-123"}
             )
             
             return {
