@@ -162,8 +162,35 @@ export default function Delivery() {
 
                   {delivery.status === 'shipped' && (
                     <div className="tracking-actions">
-                      <button className="track-btn">
-                        Track Package
+                      <button 
+                        className="track-btn"
+                        onClick={() => {
+                          // Bolt app deep link (for ride/delivery requests)
+                          const boltAppUrl = `bolt://request?pickup=${encodeURIComponent(delivery.shippingAddress)}&destination=Art Gallery Warehouse`;
+                          
+                          // Fallback to Bolt website
+                          const boltWebUrl = 'https://bolt.eu/en/cities/';
+                          
+                          // Try to open Bolt app
+                          const iframe = document.createElement('iframe');
+                          iframe.style.display = 'none';
+                          iframe.src = boltAppUrl;
+                          document.body.appendChild(iframe);
+                          
+                          // Remove iframe after attempt
+                          setTimeout(() => {
+                            document.body.removeChild(iframe);
+                          }, 1000);
+                          
+                          // Show fallback options
+                          setTimeout(() => {
+                            if (confirm('Bolt app not found. Open Bolt website to download the app?')) {
+                              window.open(boltWebUrl, '_blank');
+                            }
+                          }, 2000);
+                        }}
+                      >
+                        Track with Bolt
                       </button>
                     </div>
                   )}
